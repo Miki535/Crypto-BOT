@@ -27,45 +27,58 @@ func main() {
 	defer bot.StopLongPolling()
 
 	bh.Handle(func(bot *telego.Bot, update telego.Update) {
-		chatId := tu.ID(update.Message.Chat.ID)
+		if update.Message != nil {
+			chatId := tu.ID(update.Message.Chat.ID)
 
-		keyboard := tu.Keyboard(
-			tu.KeyboardRow(
-				tu.KeyboardButton("Bitcoin"),
-				tu.KeyboardButton("Ethereum"),
-			),
-			tu.KeyboardRow(
-				tu.KeyboardButton("Bitcoin"),
-				tu.KeyboardButton("Ethereum"),
-			),
-			tu.KeyboardRow(
-				tu.KeyboardButton("Bitcoin"),
-				tu.KeyboardButton("Ethereum"),
-			),
-			tu.KeyboardRow(
-				tu.KeyboardButton("Bitcoin"),
-				tu.KeyboardButton("Ethereum"),
-			),
-			tu.KeyboardRow(
-				tu.KeyboardButton("Bitcoin"),
-				tu.KeyboardButton("Ethereum"),
-			),
-			tu.KeyboardRow(
-				tu.KeyboardButton("Bitcoin"),
-				tu.KeyboardButton("Ethereum"),
-			),
-			tu.KeyboardRow(
-				tu.KeyboardButton("Bitcoin"),
-				tu.KeyboardButton("Ethereum"),
-			),
-		).WithResizeKeyboard().WithInputFieldPlaceholder("Select something")
+			keyboard := tu.Keyboard(
+				tu.KeyboardRow(
+					tu.KeyboardButton("Ethereum"),
+				),
+				tu.KeyboardRow(
+					tu.KeyboardButton("Bitcoin"),
+					tu.KeyboardButton("Ethereum"),
+				),
+				tu.KeyboardRow(
+					tu.KeyboardButton("Bitcoin"),
+					tu.KeyboardButton("Ethereum"),
+				),
+				tu.KeyboardRow(
+					tu.KeyboardButton("Bitcoin"),
+					tu.KeyboardButton("Ethereum"),
+				),
+				tu.KeyboardRow(
+					tu.KeyboardButton("Bitcoin"),
+					tu.KeyboardButton("Ethereum"),
+				),
+				tu.KeyboardRow(
+					tu.KeyboardButton("Bitcoin"),
+					tu.KeyboardButton("Ethereum"),
+				),
+				tu.KeyboardRow(
+					tu.KeyboardButton("Bitcoin"),
+					tu.KeyboardButton("Ethereum"),
+				),
+			).WithResizeKeyboard().WithInputFieldPlaceholder("Select something")
 
-		msg := tu.Message(
-			chatId,
-			"Hello World",
-		).WithReplyMarkup(keyboard)
+			msg := tu.Message(
+				chatId,
+				"Hello World",
+			).WithReplyMarkup(keyboard)
 
-		bot.SendMessage(msg)
+			bot.SendMessage(msg)
+
+			newmessfromuser := update.Message.Text
+
+			switch newmessfromuser {
+			case "Bitcoin":
+				msg1 := tu.Message(
+					chatId,
+					"Hello World",
+				)
+
+				bot.SendMessage(msg1)
+			}
+		}
 
 	}, th.CommandEqual("start"))
 
