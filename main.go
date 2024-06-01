@@ -48,9 +48,7 @@ func main() {
 				"Hello!",
 			)
 			bot.SendMessage(msg)
-
 		}
-
 	}, th.CommandEqual("start"))
 
 	bh.Handle(func(bot *telego.Bot, update telego.Update) {
