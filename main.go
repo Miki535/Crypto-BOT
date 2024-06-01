@@ -45,7 +45,7 @@ func main() {
 
 			msg := tu.Message(
 				chatId,
-				"Hello!",
+				"Привіт!",
 			)
 			bot.SendMessage(msg)
 		}
