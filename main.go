@@ -3,40 +3,28 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
 )
 
+type CoinGeckoResponse struct {
+	Bitcoin struct {
+		Usd float64 `json:"usd"`
+	} `json:"bitcoin"`
+	Ethereum struct {
+		Usd float64 `json:"usd"`
+	} `json:"ethereum"`
+}
+
 func main() {
-	type CoinAPIResponse struct {
-		Rate float64 `json:"rate"`
-	}
 
 	botToken := "7196274410:AAH07wSgzVqMJZRMUDpM4Gv2PMcZGlm7yVA"
-
-	var URL string
-	// api key
-	apiKey := "9697AF10-3A86-4D0A-9DD7-A996B1BF8412"
-	URL = "https://rest.coinapi.io/v1/assets/BTC" + apiKey
-	// get info from api
-	response, err := http.Get(URL)
-	//ERROR(w, r, err, "Error!\n nil information in API")
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	// обробляєм помилку
-	//ERROR(w, r, err, "Помилка читання тіла відповіді:")
-
-	var coinAPIResp CoinAPIResponse
-	err = json.Unmarshal(body, &coinAPIResp)
-	// обробляєм помилку
-	//ERROR(w, r, err, "Error!\n API LOCK!")
-	Result := fmt.Sprintf("%.2f\n", coinAPIResp.Rate)
 
 	bot, err := telego.NewBot(botToken, telego.WithDefaultDebugLogger())
 
@@ -68,14 +56,46 @@ func main() {
 
 	bh.Handle(func(bot *telego.Bot, update telego.Update) {
 		chatId := tu.ID(update.Message.Chat.ID)
+		go course("bitcoin", bot, chatId)
+	}, th.CommandEqual("bitcoin"))
 
-		msg := tu.Message(
-			chatId,
-			Result,
-		)
-		bot.SendMessage(msg)
-
-	}, th.CommandEqual("btc"))
+	bh.Handle(func(bot *telego.Bot, update telego.Update) {
+		chatId := tu.ID(update.Message.Chat.ID)
+		go course("ethereum", bot, chatId)
+	}, th.CommandEqual("ethereum"))
 
 	bh.Start()
+}
+
+func course(crypto string, bot *telego.Bot, Chatid telego.ChatID) {
+	// Встановлення тайм-ауту для HTTP-клієнта
+	client := &http.Client{Timeout: 10 * time.Second}
+
+	// Відправка запиту до CoinGecko API
+	resp, err := client.Get("https://api.coingecko.com/api/v3/simple/price?ids=" + crypto + "&vs_currencies=usd")
+	if err != nil {
+		log.Fatalf("Error fetching data from CoinGecko: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Fatalf("Error response from CoinGecko: %s", resp.Status)
+	}
+
+	// Розбір JSON-відповіді
+	var result CoinGeckoResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		log.Fatalf("Error decoding JSON response: %v", err)
+	}
+
+	switch crypto {
+	case "bitcoin":
+		Result := fmt.Sprintf("Курс біткоіну на данний момент...", result.Bitcoin.Usd)
+		bot.SendMessage(tu.Message(Chatid, Result))
+	case "ethereum":
+		Result := fmt.Sprintf("Курс ефіру на данний момент...", result.Ethereum.Usd)
+		bot.SendMessage(tu.Message(Chatid, Result))
+	default:
+		bot.SendMessage(tu.Message(Chatid, "Ми не знайшли дані про цю крипто валюту! Перевірте правильність написання назви крипто валюти!"))
+	}
 }
