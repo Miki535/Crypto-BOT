@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -74,18 +73,18 @@ func course(crypto string, bot *telego.Bot, Chatid telego.ChatID) {
 	// Відправка запиту до CoinGecko API
 	resp, err := client.Get("https://api.coingecko.com/api/v3/simple/price?ids=" + crypto + "&vs_currencies=usd")
 	if err != nil {
-		log.Fatalf("Error fetching data from CoinGecko: %v", err)
+		SendMessage(bot, Chatid, "Просто помидка хз чого.")
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		log.Fatalf("Error response from CoinGecko: %s", resp.Status)
+		SendMessage(bot, Chatid, "Помилка відповіді.")
 	}
 
 	// Розбір JSON-відповіді
 	var result CoinGeckoResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Fatalf("Error decoding JSON response: %v", err)
+		SendMessage(bot, Chatid, "Помидка при розборі JSON відповіді. Не переживайте з часом ми це вирішимо!")
 	}
 
 	switch crypto {
@@ -98,4 +97,8 @@ func course(crypto string, bot *telego.Bot, Chatid telego.ChatID) {
 	default:
 		bot.SendMessage(tu.Message(Chatid, "Ми не знайшли дані про цю крипто валюту! Перевірте правильність написання назви крипто валюти!"))
 	}
+}
+
+func SendMessage(bot *telego.Bot, chatid telego.ChatID, errormessage string) {
+	bot.SendMessage(tu.Message(chatid, errormessage))
 }
