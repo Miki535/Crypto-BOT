@@ -89,10 +89,10 @@ func course(crypto string, bot *telego.Bot, Chatid telego.ChatID) {
 
 	switch crypto {
 	case "bitcoin":
-		Result := fmt.Sprintf("Курс біткоіну на данний момент...", result.Bitcoin.Usd)
+		Result := fmt.Sprintf("Курс біткоіну на данний момент...$%.2f\n", result.Bitcoin.Usd)
 		bot.SendMessage(tu.Message(Chatid, Result))
 	case "ethereum":
-		Result := fmt.Sprintf("Курс ефіру на данний момент...", result.Ethereum.Usd)
+		Result := fmt.Sprintf("Курс ефіру на данний момент...$%.2f\n", result.Ethereum.Usd)
 		bot.SendMessage(tu.Message(Chatid, Result))
 	default:
 		bot.SendMessage(tu.Message(Chatid, "Ми не знайшли дані про цю крипто валюту! Перевірте правильність написання назви крипто валюти!"))
