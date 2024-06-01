@@ -45,7 +45,7 @@ func main() {
 
 			msg := tu.Message(
 				chatId,
-				"Привіт!",
+				"Привіт! За допомогою цього бота ви дізнаєтесь актуальний курс на такі крипто валюти як bitcoin та ethereum!",
 			)
 			bot.SendMessage(msg)
 		}
