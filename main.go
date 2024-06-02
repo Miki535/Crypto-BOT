@@ -71,7 +71,7 @@ func course(crypto string, bot *telego.Bot, Chatid telego.ChatID) {
 	// Відправка запиту до CoinGecko API
 	resp, err := client.Get("https://api.coingecko.com/api/v3/simple/price?ids=" + crypto + "&vs_currencies=usd")
 	if err != nil {
-		SendMessage(bot, Chatid, "Просто помидка хз чого.")
+		SendMessage(bot, Chatid, "Просто помилка хз чого.")
 	}
 	defer resp.Body.Close()
 
@@ -82,7 +82,7 @@ func course(crypto string, bot *telego.Bot, Chatid telego.ChatID) {
 	// Розбір JSON-відповіді
 	var result CoinGeckoResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		SendMessage(bot, Chatid, "Помидка при розборі JSON відповіді. Не переживайте з часом ми це вирішимо!")
+		SendMessage(bot, Chatid, "Помилка при розборі JSON відповіді. Не переживайте з часом ми це вирішимо!")
 	}
 
 	switch crypto {
